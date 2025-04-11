@@ -1,0 +1,29 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+python-dotenv = "*"
+django = "*"
+pytest = "*"
+celery = "*"
+redis = "*"
+elasticsearch = "*"
+django-elasticsearch-dsl = "*"
+djangorestframework = "*"
+djangorestframework-simplejwt = "*"
+drf-yasg = "*"
+django-celery-email = "*"
+django-redis = "*"
+psycopg = "*"
+psycopg2 = "*"
+psycopg2-binary = "*"
+pillow = "*"
+
+[dev-packages]
+pytest = "*"
+pytest-django = "*"
+
+[requires]
+python_version = "3.12"
