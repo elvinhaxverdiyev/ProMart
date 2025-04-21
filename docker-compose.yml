@@ -1,0 +1,112 @@
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+    networks:
+      - promart-network
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    ports:
+      - "9092:9092"
+      - "29092:29092"  # əlavə port
+    networks:
+      - promart-network
+
+  users_service:
+    build:
+      context: ./promart/services/users_services
+      dockerfile: Dockerfile
+    container_name: users_service
+    env_file: ./promart/services/users_services/.env.docker
+    ports:
+      - "8002:8002"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      kafka:
+        condition: service_started
+    networks:
+      - promart-network
+    command: sh -c "sleep 35 && python manage.py runserver 0.0.0.0:8002"
+
+  products_service:
+    build:
+      context: ./promart/services/products_services
+      dockerfile: Dockerfile
+    container_name: products_service
+    env_file: ./promart/services/products_services/.env.docker
+    ports:
+      - "8001:8001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - promart-network
+    command: python manage.py runserver 0.0.0.0:8001
+
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_DB: productdb
+      POSTGRES_USER: productuser
+      POSTGRES_PASSWORD: secret123
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./promart/services/postgres_init/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U productuser -d productdb"]
+      interval: 10s
+      retries: 10
+      start_period: 60s
+    networks:
+      - promart-network
+
+  redis:
+    image: redis:alpine
+    container_name: redis
+    restart: always
+    ports:
+      - "6379:6379"
+    networks:
+      - promart-network
+
+  celery_users:
+    build:
+      context: ./promart/services/users_services
+      dockerfile: Dockerfile.celery
+    container_name: celery_users
+    env_file: ./promart/services/users_services/.env.docker
+    depends_on:
+      - redis
+      - postgres
+      - kafka
+    networks:
+      - promart-network
+
+networks:
+  promart-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+

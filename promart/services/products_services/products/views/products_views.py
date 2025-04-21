@@ -1,106 +1,70 @@
 import logging
-from rest_framework.views import APIView, Response, status
-from django.shortcuts import get_object_or_404
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
 from products.models import Product
 from products.serializers import ProductSerializer
+from utils.permissions import is_seller
 
 logger = logging.getLogger(__name__)
 
-__all__ = [
-    "ProductsListAPIView",
-    "ProductDetailAPIView",
-]
-
+__all__ = ["ProductsListAPIView"]
 
 class ProductsListAPIView(APIView):
     """
     API endpoint for listing all products and creating a new product.
     """
+    permission_classes = [IsAuthenticated]
+
+    def get_permissions(self):
+        if self.request.method == "GET":
+            return [AllowAny()]
+        return [IsAuthenticated()]
 
     @swagger_auto_schema(
         operation_summary="List all products",
-        responses={200: ProductSerializer(many=True)},
-        tags=["Products"]
+        operation_description="Returns a list of all available products.",
+        responses={
+            200: openapi.Response(
+                description="Successful operation",
+                schema=ProductSerializer(many=True)
+            )
+        }
     )
     def get(self, request):
-        """
-        Returns a list of all available products.
-        """
         products = Product.objects.all()
         serializer = ProductSerializer(products, many=True)
-        logger.info("Fetched all products")
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(
         operation_summary="Create a new product",
+        operation_description="Allows sellers to create new products. Only users with 'seller' user_type can perform this action.",
         request_body=ProductSerializer,
-        responses={201: ProductSerializer},
-        tags=["Products"]
+        responses={
+            201: openapi.Response(
+                description="Product successfully created",
+                schema=ProductSerializer()
+            ),
+            400: "Bad request",
+            403: "Forbidden - Only sellers can create products",
+        }
     )
     def post(self, request):
-        """
-        Creates a new product with provided data.
-        """
+        user_id = request.user.id
+
+        # if not is_seller(user_id):
+        #     logger.warning(f"User {user_id} ya Redis-də tapılmadı, ya da 'seller' deyil.")
+        #     return Response({"detail": "Only sellers can create products."}, status=status.HTTP_403_FORBIDDEN)
+
         serializer = ProductSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
-            logger.info(f"Created new product: {serializer.data.get('name')}")
+            product = serializer.save(user_id=user_id)
+            logger.info(f"Yeni məhsul yaradıldı: {product.name} (user_id={user_id})")
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        logger.warning("Failed to create product due to validation error")
+
+        logger.warning("Məhsul yaratmaq uğursuz oldu: %s", serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class ProductDetailAPIView(APIView):
-    """
-    API endpoint for retrieving, updating, or deleting a specific product.
-    """
-
-    @swagger_auto_schema(
-        operation_summary="Retrieve a single product by ID",
-        responses={200: ProductSerializer, 404: "Not Found"},
-        tags=["Products"]
-    )
-    def get(self, request, product_id):
-        """
-        Retrieves the details of a specific product by its ID.
-        """
-        product = get_object_or_404(Product, id=product_id)
-        serializer = ProductSerializer(product)
-        logger.info(f"Retrieved product ID: {product_id}")
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    @swagger_auto_schema(
-        operation_summary="Update a product by ID (partial)",
-        request_body=ProductSerializer,
-        responses={200: ProductSerializer, 400: "Bad Request", 404: "Not Found"},
-        tags=["Products"]
-    )
-    def put(self, request, product_id):
-        """
-        Updates a product with new data. Allows partial updates.
-        """
-        product = get_object_or_404(Product, id=product_id)
-        serializer = ProductSerializer(product, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            logger.info(f"Updated product ID: {product_id}")
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        logger.warning(f"Failed to update product ID: {product_id}")
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    @swagger_auto_schema(
-        operation_summary="Delete a product by ID",
-        responses={204: "No Content", 404: "Not Found"},
-        tags=["Products"]
-    )
-    def delete(self, request, product_id):
-        """
-        Deletes the specified product.
-        """
-        product = get_object_or_404(Product, id=product_id)
-        product.delete()
-        logger.info(f"Deleted product ID: {product_id}")
-        return Response({"message": "deleted"}, status=status.HTTP_204_NO_CONTENT)
