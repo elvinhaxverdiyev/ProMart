@@ -41,7 +41,8 @@ class LoginView(APIView):
                     }
                 }
             ),
-        }
+        },
+        tags=["Users"]
     )
     def post(self, request) -> Response:
         logger.info("Login request received")

@@ -46,6 +46,4 @@ class SubCategorySerializer(serializers.ModelSerializer):
             "is_active", 
             "super_category"
         )
-        extra_kwargs = {
-            "super_category": {"required": True}
-        }
+       

@@ -21,7 +21,10 @@ class LogoutView(APIView):
         post: Logs the user out by blacklisting the provided refresh token.
     """
 
-    @swagger_auto_schema(request_body=LogoutSerializer)
+    @swagger_auto_schema(
+        request_body=LogoutSerializer,
+        tags=["Users"]
+    )
     def post(self, request) -> Response:
         """
         Handles the POST request to log the user out by blacklisting the refresh token.

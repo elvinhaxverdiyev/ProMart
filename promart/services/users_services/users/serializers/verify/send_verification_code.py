@@ -6,6 +6,10 @@ from services.auth import create_verification_code
 
 User = get_user_model()
 
+__all__ = [
+    "SendVerificationCodeSerializer"
+]
+
 
 class SendVerificationCodeSerializer(serializers.Serializer):
     """

@@ -6,6 +6,10 @@ from services.auth import validate_verification_code
 
 User = get_user_model()
 
+__all__ = [
+    "RegisterSerializer"
+]
+
 
 class RegisterSerializer(serializers.ModelSerializer):
     """
@@ -35,9 +39,6 @@ class RegisterSerializer(serializers.ModelSerializer):
         
     )
         
-    
-    
-
     class Meta:
         model = User
         fields = [

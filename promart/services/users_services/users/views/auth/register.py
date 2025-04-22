@@ -1,24 +1,39 @@
 import logging
-from rest_framework.views import APIView, Response, status
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
 from rest_framework.parsers import MultiPartParser, FormParser
 from django.contrib.auth import get_user_model
 from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
+
 from users.serializers import RegisterSerializer
 from users.kafka.producer import send_user_data_to_kafka
-from utils.redis_client import redis_client  # Redis client
+from utils.redis_client import redis_client
 
 __all__ = ["RegisterView"]
 
 logger = logging.getLogger(__name__)
 User = get_user_model()
 
+
 class RegisterView(APIView):
+    """
+    API view for registering a new user.
+
+    This endpoint allows new users to register by submitting their information
+    via a multipart/form-data request. Upon successful registration, user data
+    is sent to Kafka and also saved to Redis for quick access.
+    """
+
     parser_classes = (MultiPartParser, FormParser)
 
     @swagger_auto_schema(
         request_body=RegisterSerializer,
         operation_description="User registration endpoint",
-        consumes=["multipart/form-data"]
+        operation_summary="Register a new user",
+        consumes=["multipart/form-data"],
+        tags=["Users"]
     )
     def post(self, request):
         logger.info("Registration request received with data: %s", request.data)
@@ -26,15 +41,16 @@ class RegisterView(APIView):
         serializer = RegisterSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
+            logger.info("User created with ID: %s", user.id)
 
             # Kafka
             try:
                 send_user_data_to_kafka(user.id)
                 logger.info("Sent user data to Kafka for user: %s", user.email)
             except Exception as e:
-                logger.error(f"Failed to send Kafka message: {e}")
+                logger.error("Failed to send Kafka message: %s", str(e))
 
-            # Redis – `hset` ilə saxla
+            # Redis
             try:
                 redis_key = f"user:{user.id}"
                 redis_client.hset(redis_key, mapping={
@@ -47,10 +63,10 @@ class RegisterView(APIView):
                 })
                 logger.info("Saved user data to Redis: %s", redis_key)
             except Exception as e:
-                logger.error(f"Failed to save user data to Redis: {e}")
+                logger.error("Failed to save user data to Redis: %s", str(e))
 
             logger.info("Registration successful for user: %s", user.email)
             return Response({"message": "Registration successful."}, status=status.HTTP_201_CREATED)
 
-        logger.warning("Registration failed: %s", serializer.errors)
+        logger.warning("Registration failed with errors: %s", serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

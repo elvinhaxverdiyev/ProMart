@@ -2,7 +2,7 @@ import logging
 from rest_framework.views import APIView, Response, status
 from drf_yasg.utils import swagger_auto_schema
 
-from users.serializers.send_verification_code import SendVerificationCodeSerializer
+from users.serializers.verify import SendVerificationCodeSerializer
 from users.models import DailyMessage
 from users.tasks import send_verification_email
 
@@ -20,7 +20,10 @@ class SendVerificationCodeView(APIView):
     message sending constraints.
     """
 
-    @swagger_auto_schema(request_body=SendVerificationCodeSerializer)
+    @swagger_auto_schema(
+        request_body=SendVerificationCodeSerializer,
+        tags=["Send Verify Code"]
+        )
     def post(self, request) -> Response:
         """
         Handle POST request to send a verification code to the provided email address.

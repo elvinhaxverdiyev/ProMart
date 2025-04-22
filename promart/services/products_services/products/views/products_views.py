@@ -5,6 +5,7 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
+from django.shortcuts import get_object_or_404
 
 from products.models import Product
 from products.serializers import ProductSerializer
@@ -12,7 +13,9 @@ from utils.permissions import is_seller
 
 logger = logging.getLogger(__name__)
 
-__all__ = ["ProductsListAPIView"]
+__all__ = ["ProductsListAPIView",
+           "ProductDetailAPIView"
+        ]
 
 class ProductsListAPIView(APIView):
     """
@@ -68,3 +71,32 @@ class ProductsListAPIView(APIView):
 
         logger.warning("Məhsul yaratmaq uğursuz oldu: %s", serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ProductDetailAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get_permissions(self):
+        if self.request.method == "GET":
+            return [AllowAny()]
+        return [IsAuthenticated()]
+    
+    def get(self, request, product_id):
+        
+        product = get_object_or_404(Product, id=product_id)
+        serializer = ProductSerializer(product)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    def put(self, request, product_id):
+        product = get_object_or_404(Product, id=product_id)
+        serializer = ProductSerializer(product, data=request.data, partial=True)
+        
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def delete(self, request, product_id):
+        product = get_object_or_404(Product, id=product_id)
+        product.delete()
+        return Response({"message": "deleted"}, status=status.HTTP_204_NO_CONTENT)
