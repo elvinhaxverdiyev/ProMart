@@ -55,6 +55,7 @@ uvicorn = "*"
 requests = "*"
 kafka-python = "*"
 openai = "==0.28"
+aiokafka = "*"
 python-telegram-bot = "*"
 
 [dev-packages]

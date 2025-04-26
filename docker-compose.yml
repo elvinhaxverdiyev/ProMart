@@ -62,23 +62,6 @@ services:
       - promart-network
     command: python manage.py runserver 0.0.0.0:8001
 
-  notification_service:
-    build:
-      context: ./promart/services/notifications_services
-      dockerfile: Dockerfile
-    container_name: notification_service
-    env_file: ./promart/services/notifications_services/.env.docker
-    ports:
-      - "8003:8003"
-    depends_on:
-      - kafka
-    networks:
-      - promart-network
-    environment:
-      - KAFKA_BROKER=kafka:9092
-    command: python manage.py runserver 0.0.0.0:8003
-
-
   postgres:
     image: postgres:15
     container_name: postgres

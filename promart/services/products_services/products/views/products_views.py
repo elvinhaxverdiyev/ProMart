@@ -6,11 +6,12 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from django.shortcuts import get_object_or_404
+import asyncio
 
 from products.models import Product
 from products.serializers import ProductSerializer
 from utils.permissions import is_seller
-from products.kafka.producer_notification import send_product_to_notification
+from utils.telegram_sender import send_product_to_telegram
 
 
 logger = logging.getLogger(__name__)
@@ -84,9 +85,10 @@ class ProductsListAPIView(APIView):
         if serializer.is_valid():
             product = serializer.save(user_id=user_id)
             logger.info(f"Yeni məhsul yaradıldı: {product.name} (user_id={user_id})")
-            send_product_to_notification(product)
+            asyncio.run(send_product_to_telegram(product))
+            
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-
+            
         logger.warning("Məhsul yaratmaq uğursuz oldu: %s", serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

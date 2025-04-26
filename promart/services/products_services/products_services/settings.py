@@ -157,7 +157,7 @@ SWAGGER_SETTINGS = {
 
 # Kafka conf
 KAFKA_BOOTSTRAP_SERVERS = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "kafka:9092")
-KAFKA_PRODUCT_TOPIC = os.getenv("KAFKA_TOPIC", "products_topic")
+KAFKA_PRODUCT_TOPIC = os.getenv("KAFKA_PRODUCT_TOPIC", "products_topic")
 
 
 # JWT Configuration
