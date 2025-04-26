@@ -54,6 +54,8 @@ fastapi = "*"
 uvicorn = "*"
 requests = "*"
 kafka-python = "*"
+openai = "==0.28"
+python-telegram-bot = "*"
 
 [dev-packages]
 pytest = "*"

@@ -17,6 +17,7 @@ services:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092  # Burada KAFKA_LISTENERS əlavə etdik
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
@@ -25,6 +26,7 @@ services:
       - "29092:29092"  # əlavə port
     networks:
       - promart-network
+
 
   users_service:
     build:
@@ -59,6 +61,23 @@ services:
     networks:
       - promart-network
     command: python manage.py runserver 0.0.0.0:8001
+
+  notification_service:
+    build:
+      context: ./promart/services/notifications_services
+      dockerfile: Dockerfile
+    container_name: notification_service
+    env_file: ./promart/services/notifications_services/.env.docker
+    ports:
+      - "8003:8003"
+    depends_on:
+      - kafka
+    networks:
+      - promart-network
+    environment:
+      - KAFKA_BROKER=kafka:9092
+    command: python manage.py runserver 0.0.0.0:8003
+
 
   postgres:
     image: postgres:15
