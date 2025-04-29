@@ -10,6 +10,9 @@ from django.core.exceptions import ObjectDoesNotExist
 # Set up logger
 logger = logging.getLogger(__name__)
 
+# Global variable for lazy initialization
+_producer = None
+
 def create_kafka_producer(retries=5, delay=3):
     """
     Creates a KafkaProducer instance with retry logic in case the broker is not available.
@@ -33,8 +36,14 @@ def create_kafka_producer(retries=5, delay=3):
     logger.error("Kafka broker not available after retries.")
     raise Exception("Kafka broker not available after retries")
 
-# Initialize Kafka producer
-producer = create_kafka_producer()
+def get_kafka_producer():
+    """
+    Lazily initializes and returns the KafkaProducer instance.
+    """
+    global _producer
+    if _producer is None:
+        _producer = create_kafka_producer()
+    return _producer
 
 def send_user_data_to_kafka(user_id):
     """
@@ -57,6 +66,7 @@ def send_user_data_to_kafka(user_id):
     }
 
     try:
+        producer = get_kafka_producer()  
         producer.send(settings.KAFKA_TOPIC, user_data)
         producer.flush()
         logger.info(f"Sent user {user.id} data to Kafka topic: {settings.KAFKA_TOPIC}")

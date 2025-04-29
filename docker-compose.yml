@@ -23,7 +23,7 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     ports:
       - "9092:9092"
-      - "29092:29092"  # əlavə port
+      - "29092:29092"  
     networks:
       - promart-network
 
@@ -61,6 +61,22 @@ services:
     networks:
       - promart-network
     command: python manage.py runserver 0.0.0.0:8001
+
+
+  orders_service:
+    build:
+      context: ./promart/services/orders_services
+      dockerfile: Dockerfile
+    container_name: orders_service
+    env_file: ./promart/services/orders_services/.env.docker
+    ports:
+      - "8003:8003"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - promart-network
+    command: python manage.py runserver 0.0.0.0:8003
 
   postgres:
     image: postgres:15
@@ -104,6 +120,34 @@ services:
       - kafka
     networks:
       - promart-network
+    
+  celery_products:
+    build:
+      context: ./promart/services/products_services
+      dockerfile: Dockerfile.celery
+    container_name: celery_products
+    env_file: ./promart/services/products_services/.env.docker
+    depends_on:
+      - redis
+      - postgres
+      - kafka
+    networks:
+      - promart-network
+
+  celery_beat_products:
+    build:
+      context: ./promart/services/products_services
+      dockerfile: Dockerfile.celery
+    container_name: celery_beat_products
+    env_file: ./promart/services/products_services/.env.docker
+    depends_on:
+      - redis
+      - postgres
+      - kafka
+      - celery_products
+    command: celery -A products_services beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    networks:
+      - promart-network
 
 networks:
   promart-network:
@@ -111,4 +155,6 @@ networks:
 
 volumes:
   postgres_data:
+
+
 

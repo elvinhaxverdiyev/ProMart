@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from dotenv import load_dotenv
 from pathlib import Path
 from datetime import timedelta
+from celery.schedules import crontab
 import os
 
 # Build paths inside the project like this: BASE_DIR / "subdir".
@@ -41,10 +42,12 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     
-    
+    # Third party
+    "django_celery_beat",
     "rest_framework",
     "drf_yasg",
     
+    # Apps
     "products",
 ]
 
@@ -188,3 +191,25 @@ USER_SERVICE_URL = "http://users_service:8002/api/v1/"
 
 #gpt api key
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+
+# Lokal
+# CELERY_BROKER_URL = "redis://localhost:6379/0"
+# CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
+
+# Docker
+CELERY_BROKER_URL = "redis://redis:6379/0"
+CELERY_RESULT_BACKEND = "redis://redis:6379/0"
+
+
+# Serialization format of tasks (optional)
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+
+# Celery beat conf
+CELERY_BEAT_SCHEDULE = {
+    'delete-expired-products-every-day': {
+        'task': 'products.tasks.remove_expired_products',
+        'schedule': crontab(hour=0, minute=0), 
+    },
+}

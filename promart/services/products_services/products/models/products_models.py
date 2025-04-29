@@ -1,4 +1,6 @@
 from django.db import models
+from datetime import timedelta
+from django.utils import timezone
 
 from .category_models import Category
 
@@ -52,3 +54,8 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name or f"Product #{self.id}"
+
+    def save(self, *args, **kwargs):
+        if not self.expire_at:
+            self.expire_at = timezone.now() + timedelta(days=30)
+        super().save(*args, **kwargs)

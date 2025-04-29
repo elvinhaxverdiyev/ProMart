@@ -57,6 +57,7 @@ kafka-python = "*"
 openai = "==0.28"
 aiokafka = "*"
 python-telegram-bot = "*"
+django-celery-beat = "*"
 
 [dev-packages]
 pytest = "*"

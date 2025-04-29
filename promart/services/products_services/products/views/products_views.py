@@ -12,6 +12,7 @@ from products.models import Product
 from products.serializers import ProductSerializer
 from utils.permissions import is_seller
 from utils.telegram_sender import send_product_to_telegram
+from products.kafka.producer import send_message
 
 
 logger = logging.getLogger(__name__)
@@ -71,26 +72,38 @@ class ProductsListAPIView(APIView):
     def post(self, request):
         """
         Creates a new product in the system.
-
         This method is restricted to authenticated users with 'seller' user_type.
         """
         user_id = request.user.id
-
-        # Check if the user is a seller
-        # if not is_seller(user_id):
-        #     logger.warning(f"User {user_id} ya Redis-də tapılmadı, ya da 'seller' deyil.")
-        #     return Response({"detail": "Only sellers can create products."}, status=status.HTTP_403_FORBIDDEN)
 
         serializer = ProductSerializer(data=request.data)
         if serializer.is_valid():
             product = serializer.save(user_id=user_id)
             logger.info(f"Yeni məhsul yaradıldı: {product.name} (user_id={user_id})")
+            
+            # Kafka-ya göndərmək üçün dictionary düzəldirik
+            message_data = {
+                "id": product.id,
+                "name": product.name,
+                "description": product.description,
+                "price": float(product.price),
+                "stock": product.stock,
+                "status": product.status,
+                "user_id": product.user_id,
+                "image": product.image.url if product.image else None,
+            }
+
+            # 'id' key olaraq, 'name' isə value olaraq Kafka-ya göndərilir
+            send_message("product_topic", str(product.id), str(product.name))
+            
+            # Teleqram bildirişi
             asyncio.run(send_product_to_telegram(product))
             
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-            
+
         logger.warning("Məhsul yaratmaq uğursuz oldu: %s", serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 class ProductDetailAPIView(APIView):

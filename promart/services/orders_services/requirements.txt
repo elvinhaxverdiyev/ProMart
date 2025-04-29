@@ -17,15 +17,12 @@ click-didyoumean==0.3.1
 click-plugins==1.1.1
 click-repl==0.3.0
 colorama==0.4.6
-cron-descriptor==1.4.5
 distro==1.9.0
 Django==5.2
 django-appconf==1.1.0
-django-celery-beat==2.8.0
 django-celery-email==3.0.0
 django-elasticsearch-dsl==8.0
 django-redis==5.4.0
-django-timezone-field==7.1
 djangorestframework==3.16.0
 djangorestframework_simplejwt==5.5.0
 drf-yasg==1.21.10
@@ -57,7 +54,6 @@ pydantic==2.11.3
 pydantic_core==2.33.1
 PyJWT==2.9.0
 pytest==8.3.5
-python-crontab==3.2.0
 python-dateutil==2.9.0.post0
 python-dotenv==1.1.0
 python-telegram-bot==22.0

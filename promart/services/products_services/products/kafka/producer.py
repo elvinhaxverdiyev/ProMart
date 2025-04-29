@@ -1,22 +1,15 @@
+# products/kafka/producer.py
 from kafka import KafkaProducer
-from django.conf import settings
-import json
 
-# Create a Kafka producer instance
-producer = KafkaProducer(
-    bootstrap_servers=settings.KAFKA_BOOTSTRAP_SERVERS,  # Kafka server connection settings
-    value_serializer=lambda v: json.dumps(v).encode('utf-8')  # Serialize messages to JSON format
-)
+_producer = None
 
-def send_message(data):
-    """
-    Sends a message to the Kafka topic.
+def get_producer():
+    global _producer
+    if _producer is None:
+        _producer = KafkaProducer(bootstrap_servers="kafka:9092", value_serializer=lambda v: str(v).encode('utf-8'), key_serializer=lambda k: str(k).encode('utf-8'))
+    return _producer
 
-    Args:
-        data (dict): The data to be sent to the Kafka topic. This should be a dictionary.
-    """
-    # Send the data to the Kafka topic specified in settings
-    producer.send(settings.KAFKA_TOPIC, data)
-    
-    # Ensure that the message is sent immediately
+def send_message(topic, key, value):
+    producer = get_producer()
+    producer.send(topic, key=key, value=value)
     producer.flush()
