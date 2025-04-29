@@ -7,6 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from orders.models.cart_model import Cart
 from orders.serializers.cart_serializers import CartSerializer
+from orders.kafka.producer import send_order_to_payment_topic
 
 __all__ = [
     "ToggleCartView",
@@ -81,6 +82,14 @@ class ToggleCartView(APIView):
             return Response({'error': 'Product ID is required.'}, status=status.HTTP_400_BAD_REQUEST)
 
         success = Cart.toggle_cart(user=request.user, product_id=product_id)
+        
+        order_event = {
+        "user_id": str(request.user.id),
+        "product_id": product_id,
+        "action": "added" if success else "removed"
+    }
+        send_order_to_payment_topic(order_event)
+
         
         if success:
             return Response({'message': 'Product added to cart.'}, status=status.HTTP_201_CREATED)
