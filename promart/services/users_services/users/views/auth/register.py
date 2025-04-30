@@ -8,7 +8,7 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
 from users.serializers import RegisterSerializer
-from users.kafka.producer import send_user_data_to_kafka
+from users.kafka.producer import send_message
 from utils.redis_client import redis_client
 
 __all__ = ["RegisterView"]
@@ -45,7 +45,7 @@ class RegisterView(APIView):
 
             # Kafka
             try:
-                send_user_data_to_kafka(user.id)
+                send_message(user.id)
                 logger.info("Sent user data to Kafka for user: %s", user.email)
             except Exception as e:
                 logger.error("Failed to send Kafka message: %s", str(e))

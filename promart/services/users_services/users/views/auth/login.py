@@ -3,7 +3,7 @@ from rest_framework.views import APIView, Response, status
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from users.serializers import LoginSerializer
-from users.kafka.producer import send_user_data_to_kafka
+from users.kafka.producer import send_message
 from utils.redis_client import redis_client
 from django.contrib.auth import get_user_model
 
@@ -53,7 +53,7 @@ class LoginView(APIView):
 
             # Kafka
             try:
-                send_user_data_to_kafka(user.id)
+                send_message(user.id)
                 logger.info(f"User data sent to Kafka: {user.email}")
             except Exception as e:
                 logger.error(f"Kafka error during login: {e}")

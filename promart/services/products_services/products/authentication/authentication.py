@@ -4,6 +4,7 @@ from rest_framework_simplejwt.settings import api_settings
 from rest_framework_simplejwt.tokens import UntypedToken
 from rest_framework.authentication import get_authorization_header
 
+
 class CustomJWTAuthentication(JWTAuthentication):
     """
     Custom JWT Authentication class that overrides the default JWT authentication mechanism.
@@ -57,10 +58,23 @@ class CustomJWTAuthentication(JWTAuthentication):
         Returns:
             DummyUser: A dummy user object with the user_id and authentication status.
         """
+        
+        try:
+            email = validated_token["email"]
+            user_type = validated_token["user_type"]
+        except KeyError:
+            raise InvalidToken("Token is missing necessary user information")
+
         # Dummy user class to simulate a user object
         class DummyUser:
-            def __init__(self, user_id):
+            def __init__(self, user_id, user_type, email):
                 self.id = user_id
+                self.email = email
+                self.user_type = user_type
                 self.is_authenticated = True
 
-        return DummyUser(validated_token["user_id"])
+        return DummyUser(
+            validated_token["user_id"],
+            validated_token["email"],
+            validated_token.get("user_type")
+        )

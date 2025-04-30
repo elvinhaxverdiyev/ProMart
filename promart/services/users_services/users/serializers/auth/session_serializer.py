@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
+from services.auth.tokens import get_tokens_for_user
 
 __all__ = [
     "LoginSerializer",
@@ -31,12 +32,13 @@ class LoginSerializer(serializers.Serializer):
         if not user:
             raise serializers.ValidationError("Invalid email or password.")
 
-        refresh = RefreshToken.for_user(user)
+
+        tokens = get_tokens_for_user(user)
 
         return {
             "user": user,
-            "refresh": str(refresh),
-            "access": str(refresh.access_token),
+            "refresh": tokens["refresh"],
+            "access": tokens["access"]
         }
 
 

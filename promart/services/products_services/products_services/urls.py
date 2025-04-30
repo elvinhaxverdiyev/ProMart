@@ -27,9 +27,9 @@ from drf_yasg import openapi
 # Swagger configuration
 schema_view = get_schema_view(
     openapi.Info(
-        title="ProMart API",
+        title="ProMart Product API",
         default_version="v1",
-        description="This is the API documentation for Instagram Copy.",
+        description="This is the API documentation for Promart Product Copy.",
         terms_of_service="https://www.google.com/policies/terms/",
         contact=openapi.Contact(email="contact@myapi.com"),
         license=openapi.License(name="BSD License"),
@@ -63,5 +63,4 @@ urlpatterns = [
         "api/v1/", include("products.urls")
     ),
     
-
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

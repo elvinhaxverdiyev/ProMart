@@ -1,44 +1,47 @@
 # import openai
+# import logging
 # from django.conf import settings
 
-# # OpenAI API açarını settings-dən əldə edirik
+# # Configure logging
+# logger = logging.getLogger(__name__)
+
+# # Set OpenAI API key from Django settings
 # openai.api_key = settings.OPENAI_API_KEY
 
 # def generate_product_description(name):
 #     """
-#     Generates an engaging and detailed product description using OpenAI's GPT model.
+#     Generate a detailed and engaging product description using OpenAI's GPT model.
 
-#     This function takes a product name as input and uses OpenAI's GPT-3.5 model to generate
-#     a creative and detailed description for the product. The generated description can be
-#     used in an e-commerce platform to enhance the product's appeal.
+#     This function sends a prompt to the OpenAI GPT-3.5-turbo model to generate a creative 
+#     product description that can be used in e-commerce platforms.
 
 #     Args:
-#         name (str): The name of the product for which the description is to be generated.
+#         name (str): Name of the product.
 
 #     Returns:
-#         str: The generated product description.
+#         str: Generated product description or an error message if something goes wrong.
 #     """
 #     prompt = f"Write an engaging and detailed description for a product named {name}."
+#     logger.info(f"Generating product description for: {name}")
 
 #     try:
-#         # Create a ChatCompletion request with OpenAI API
 #         response = openai.ChatCompletion.create(
-#             model="gpt-3.5-turbo",  # Yeni model adı
-#             messages=[  # Yeni interfeys formatında mesajlar göndərilir
+#             model="gpt-3.5-turbo",
+#             messages=[
 #                 {"role": "system", "content": "You are a professional e-commerce product writer."},
 #                 {"role": "user", "content": prompt}
 #             ],
 #             max_tokens=200,
 #             temperature=0.7
 #         )
-        
-#         # Return the generated product description
-#         return response['choices'][0]['message']['content'].strip()
-    
+#         description = response["choices"][0]["message"]["content"].strip()
+#         logger.info("Product description generated successfully.")
+#         return description
+
 #     except openai.OpenAIError as e:
-#         # Handle API errors (e.g., connection issues, quota limits)
+#         logger.error(f"OpenAI API error: {e}")
 #         return f"Error generating product description: {e}"
 
 #     except Exception as e:
-#         # General error handler
+#         logger.exception(f"Unexpected error: {e}")
 #         return f"An unexpected error occurred: {e}"

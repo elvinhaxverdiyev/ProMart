@@ -27,13 +27,11 @@ load_dotenv(BASE_DIR / ".env")
 SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don"t run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DEBUG", "False") == "True"
 
 ALLOWED_HOSTS = ["*"]
 
-
 # Application definition
-
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -165,8 +163,12 @@ KAFKA_PRODUCT_TOPIC = os.getenv("KAFKA_PRODUCT_TOPIC", "products_topic")
 
 # JWT Configuration
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=int(os.getenv("JWT_ACCESS_TOKEN_LIFETIME", 30))),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=int(os.getenv("JWT_REFRESH_TOKEN_LIFETIME", 1))),
+    "ACCESS_TOKEN_LIFETIME": timedelta(
+        minutes=int(os.getenv("JWT_ACCESS_TOKEN_LIFETIME", 30)
+    )),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=int(
+        os.getenv("JWT_REFRESH_TOKEN_LIFETIME", 1)
+    )),
     "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": True,
     "ALGORITHM": "HS256",
@@ -208,8 +210,8 @@ CELERY_RESULT_SERIALIZER = "json"
 
 # Celery beat conf
 CELERY_BEAT_SCHEDULE = {
-    'delete-expired-products-every-day': {
-        'task': 'products.tasks.remove_expired_products',
-        'schedule': crontab(hour=0, minute=0), 
+    "delete-expired-products-every-day": {
+        "task": "products.tasks.remove_expired_products",
+        "schedule": crontab(hour=0, minute=0), 
     },
 }
