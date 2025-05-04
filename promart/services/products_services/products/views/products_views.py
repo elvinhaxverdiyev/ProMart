@@ -106,7 +106,7 @@ class ProductsListAPIView(APIView):
             }
 
             # Send Kafka message to product_topic
-            send_message("product_topic", str(product.id), message_data)
+            send_message("products_topic", str(product.id), message_data)
 
             # Send Telegram notification
             asyncio.run(send_product_to_telegram(product))
@@ -116,40 +116,6 @@ class ProductsListAPIView(APIView):
         logger.warning("Product creation failed: %s", serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    # def post(self, request):
-    #     """
-    #     Creates a new product in the system.
-    #     This method is restricted to authenticated users with "seller" user_type.
-    #     """
-    #     user_id = request.user.id
-
-    #     serializer = ProductSerializer(data=request.data)
-    #     if serializer.is_valid():
-    #         product = serializer.save(user_id=user_id)
-    #         logger.info(f"Yeni məhsul yaradıldı: {product.name} (user_id={user_id})")
-            
-    #         # Kafka message
-    #         message_data = {
-    #             "id": product.id,
-    #             "name": product.name,
-    #             "description": product.description,
-    #             "price": float(product.price),
-    #             "stock": product.stock,
-    #             "status": product.status,
-    #             "user_id": product.user_id,
-    #             "image": product.image.url if product.image else None,
-    #         }
-
-    #         # Kafka sending message for topic
-    #         send_message("product_topic", str(product.id), str(product.name))
-            
-    #         # Telegram notification
-    #         asyncio.run(send_product_to_telegram(product))
-            
-    #         return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-    #     logger.warning("Məhsul yaratmaq uğursuz oldu: %s", serializer.errors)
-    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class ProductDetailAPIView(APIView):
     """

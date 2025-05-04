@@ -24,7 +24,9 @@ class Cart(models.Model):
         """
         cart_item, created = cls.objects.get_or_create(user_id=user.id, product_id=product_id)
         if created:
-            return True
+            return True, cart_item
         
         cart_item.delete()
-        return False
+        return False, None
+
+

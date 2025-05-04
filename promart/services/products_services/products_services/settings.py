@@ -159,7 +159,7 @@ SWAGGER_SETTINGS = {
 # Kafka conf
 KAFKA_BOOTSTRAP_SERVERS = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "kafka:9092")
 KAFKA_PRODUCT_TOPIC = os.getenv("KAFKA_PRODUCT_TOPIC", "products_topic")
-
+KAFKA_USER_TOPIC = os.getenv("KAFKA_USER_TOPIC", "users_topic")
 
 # JWT Configuration
 SIMPLE_JWT = {
@@ -215,3 +215,4 @@ CELERY_BEAT_SCHEDULE = {
         "schedule": crontab(hour=0, minute=0), 
     },
 }
+

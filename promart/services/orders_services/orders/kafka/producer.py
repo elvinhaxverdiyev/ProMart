@@ -1,5 +1,3 @@
-# orders/kafka/producer.py
-
 import json
 from kafka import KafkaProducer
 from django.conf import settings

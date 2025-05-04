@@ -1,4 +1,5 @@
 import logging
+
 from users.models import VerificationCode
 from utils.verification_code import generate_verification_code
 

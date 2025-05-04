@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     
     "rest_framework",
+    "drf_yasg",
     
     "payments",
 ]
@@ -153,6 +154,22 @@ REST_FRAMEWORK = {
 KAFKA_BOOTSTRAP_SERVERS = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "kafka:9092")
 KAFKA_PAYMENT_TOPIC = os.getenv("KAFKA_PAYMENT_TOPIC", "payment_topic")
 
-PAYPAL_MODE = os.getenv("PAYPAL_MODE")
+PAYPAL_MODE = os.getenv("PAYPAL_MODE", "sandbox")
 PAYPAL_CLIENT_ID = os.getenv("PAYPAL_CLIENT_ID")
 PAYPAL_CLIENT_SECRET = os.getenv("PAYPAL_CLIENT_SECRET")
+
+# Swagger configuration
+SWAGGER_SETTINGS = {
+    "SECURITY_DEFINITIONS": {
+        "Bearer": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header",
+        }
+    },
+    "USE_SESSION_AUTH": False,  
+}
+
+# Path and URL of media files
+MEDIA_URL = "/media/" 
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")

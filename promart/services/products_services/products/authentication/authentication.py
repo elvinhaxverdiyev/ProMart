@@ -74,7 +74,7 @@ class CustomJWTAuthentication(JWTAuthentication):
                 self.is_authenticated = True
 
         return DummyUser(
-            validated_token["user_id"],
-            validated_token["email"],
-            validated_token.get("user_type")
+            user_id=validated_token["user_id"],
+            user_type=validated_token.get("user_type"),
+            email=validated_token["email"]
         )

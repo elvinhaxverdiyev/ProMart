@@ -8,10 +8,10 @@ KAFKA_PRODUCT_TOPIC = os.getenv("KAFKA_PRODUCT_TOPIC", "products_topic")
 consumer = KafkaConsumer(
     KAFKA_PRODUCT_TOPIC,
     bootstrap_servers=KAFKA_BOOTSTRAP_SERVERS,
-    value_deserializer=lambda m: json.loads(m.decode('utf-8')),
-    auto_offset_reset='earliest',
+    value_deserializer=lambda m: json.loads(m.decode("utf-8")),
+    auto_offset_reset="earliest",
     enable_auto_commit=True,
-    group_id='order-service-group'
+    group_id="order-service-group"
 )
 
 def listen_to_products():
@@ -19,9 +19,11 @@ def listen_to_products():
     for message in consumer:
         product_data = message.value
         print("Yeni məhsul gəldi:", product_data)
-        
-        # Burda artıq məhsulun id, name və s. var
-        product_id = product_data["id"]
 
-        # Burda sən istədiyin kimi `order` və ya `cart` modelinə əlavə edə bilərsən
-        # Məsələn, avtomatik məhsulu 'kataloq' siyahısına əlavə etmək və s.
+        product_id = product_data.get("id")
+        product_name = product_data.get("name")
+        product_price = product_data.get("price")
+
+        print(f"Product ID: {product_id}, Name: {product_name}, Price: {product_price}")
+
+

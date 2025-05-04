@@ -17,7 +17,7 @@ services:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
-      KAFKA_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092  # Burada KAFKA_LISTENERS əlavə etdik
+      KAFKA_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092  
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
@@ -26,7 +26,6 @@ services:
       - "29092:29092"  
     networks:
       - promart-network
-
 
   users_service:
     build:
@@ -48,6 +47,9 @@ services:
     command: sh -c "sleep 35 && python manage.py runserver 0.0.0.0:8002"
 
   products_service:
+    environment:
+      - PYTHONPATH=/app:/app/promart/services
+      - DJANGO_SETTINGS_MODULE=products_services.settings
     build:
       context: ./promart/services/products_services
       dockerfile: Dockerfile
@@ -78,29 +80,11 @@ services:
       - promart-network
     command: python manage.py runserver 0.0.0.0:8003
 
-  payments_service:
-    build:
-      context: ./promart/services/payments_services
-      dockerfile: Dockerfile
-    container_name: payments_service
-    env_file: ./promart/services/payments_services/.env.docker
-    ports:
-      - "8004:8004"
-    depends_on:
-      postgres:
-        condition: service_healthy
-    networks:
-      - promart-network
-    command: python manage.py runserver 0.0.0.0:8004
-
   postgres:
     image: postgres:15
     container_name: postgres
+    env_file: ./.env.docker
     restart: always
-    environment:
-      POSTGRES_DB: productdb
-      POSTGRES_USER: productuser
-      POSTGRES_PASSWORD: secret123
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./promart/services/postgres_init/init.sql:/docker-entrypoint-initdb.d/init.sql
@@ -164,12 +148,41 @@ services:
     networks:
       - promart-network
 
+  payments_service:
+    build:
+      context: ./promart/services/payments_services
+      dockerfile: Dockerfile
+    container_name: payments_service
+    env_file: ./promart/services/payments_services/.env.docker
+    ports:
+      - "8004:8004"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+    networks:
+      - promart-network
+    command: python manage.py runserver 0.0.0.0:8004
+
+  payments_kafka_consumer:
+    build:
+      context: ./promart/services/payments_services
+      dockerfile: Dockerfile
+    container_name: payments_kafka_consumer
+    env_file: ./promart/services/payments_services/.env.docker
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+    networks:
+      - promart-network
+    command: python manage.py run_kafka_consumers
+
 networks:
   promart-network:
     driver: bridge
 
 volumes:
   postgres_data:
-
-
-

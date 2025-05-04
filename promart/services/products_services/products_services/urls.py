@@ -29,7 +29,7 @@ schema_view = get_schema_view(
     openapi.Info(
         title="ProMart Product API",
         default_version="v1",
-        description="This is the API documentation for Promart Product Copy.",
+        description="This is the API documentation for Promart Product.",
         terms_of_service="https://www.google.com/policies/terms/",
         contact=openapi.Contact(email="contact@myapi.com"),
         license=openapi.License(name="BSD License"),

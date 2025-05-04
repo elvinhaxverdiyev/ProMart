@@ -32,9 +32,9 @@ from rest_framework_simplejwt.views import (
 # Swagger configuration
 schema_view = get_schema_view(
     openapi.Info(
-        title="InstaCopy API",
+        title="Promart User API",
         default_version="v1",
-        description="This is the API documentation for Instagram Copy.",
+        description="This is the API documentation for Promart User.",
         terms_of_service="https://www.google.com/policies/terms/",
         contact=openapi.Contact(email="contact@myapi.com"),
         license=openapi.License(name="BSD License"),
