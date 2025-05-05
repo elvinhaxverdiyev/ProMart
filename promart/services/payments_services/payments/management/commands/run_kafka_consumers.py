@@ -3,7 +3,14 @@ from payments.kafka.consumer import listen_to_payment_topic
 from payments.kafka.product_consumer import listen_to_product_topic
 import threading
 
+
 class Command(BaseCommand):
+    """
+    Starts Kafka consumers for payments and products in separate threads.
+
+    Run with: python manage.py run_kafka_consumers
+    """
+
     help = "Kafka starting..."
 
     def handle(self, *args, **options):

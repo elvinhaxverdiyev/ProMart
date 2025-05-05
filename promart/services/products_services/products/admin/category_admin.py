@@ -96,6 +96,7 @@ class CategoryAdmin(admin.ModelAdmin):
             obj.order = obj.get_next_order() 
         super().save_model(request, obj, form, change)
 
+
     class SubCategoryInline(admin.TabularInline):
         """
         Inline representation for subcategories in the admin panel.

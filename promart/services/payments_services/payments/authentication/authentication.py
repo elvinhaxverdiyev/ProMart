@@ -4,6 +4,7 @@ from rest_framework_simplejwt.settings import api_settings
 from rest_framework_simplejwt.tokens import UntypedToken
 from rest_framework.authentication import get_authorization_header
 
+
 class CustomJWTAuthentication(JWTAuthentication):
     """
     Custom JWT Authentication class that overrides the default JWT authentication mechanism.

@@ -60,7 +60,8 @@ urlpatterns = [
 
     # API paths
     path(
-        "api/v1/", include("products.urls")
+        "api/v1/", 
+        include("products.urls")
     ),
     
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

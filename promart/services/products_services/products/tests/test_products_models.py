@@ -43,7 +43,7 @@ def test_products_list_get():
     # Check if the response is correct
     assert response.status_code == status.HTTP_200_OK
     assert isinstance(response.data, list)
-    if response.data:  # Even if there is an error, the test will pass
+    if response.data:  
         assert response.data[0]['name'] == "Test Product"
 
 @pytest.mark.django_db

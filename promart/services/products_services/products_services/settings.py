@@ -191,7 +191,7 @@ REDIS_DB = int(os.getenv("REDIS_DB", 0))
 USER_SERVICE_URL = "http://users_service:8002/api/v1/"
 
 
-#gpt api key
+# gpt api key
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 # Lokal
@@ -215,4 +215,3 @@ CELERY_BEAT_SCHEDULE = {
         "schedule": crontab(hour=0, minute=0), 
     },
 }
-

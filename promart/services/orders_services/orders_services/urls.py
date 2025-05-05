@@ -56,7 +56,8 @@ urlpatterns = [
         schema_view.with_ui("redoc", cache_timeout=0),
         name="redoc-ui",
     ),
-    
+
+    # Apps
     path(
         "api/v1/", 
         include("orders.urls")
