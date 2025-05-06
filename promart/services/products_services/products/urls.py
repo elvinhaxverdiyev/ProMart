@@ -2,6 +2,7 @@ from django.urls import path
 
 from products.views import *
 
+
 urlpatterns = [
     # Product endpoints
     path(
@@ -27,6 +28,18 @@ urlpatterns = [
         "subcategories/<int:super_id>/",
         SubCategoryAPIView.as_view(),
         name="subcategory-list"
+    ),
+    
+     path(
+        "comments/products/<int:product_id>/comment/", 
+        CommentCreateAPIView.as_view(), 
+        name="create_comment"
+    ),
+    
+    path(
+        "comments/products/<int:product_id>/comments/", 
+        CommentListAPIView.as_view(), 
+        name="list_comments"
     ),
 ]
 

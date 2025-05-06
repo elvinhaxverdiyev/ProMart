@@ -1,22 +1,17 @@
 from django.core.management.base import BaseCommand
 from payments.kafka.consumer import listen_to_payment_topic
 from payments.kafka.product_consumer import listen_to_product_topic
-import threading
+from threading import Thread
 
 
 class Command(BaseCommand):
-    """
-    Starts Kafka consumers for payments and products in separate threads.
-
-    Run with: python manage.py run_kafka_consumers
-    """
-
-    help = "Kafka starting..."
+    help = "Runs Kafka consumers for payment and product topics"
 
     def handle(self, *args, **options):
-        payment_thread = threading.Thread(target=listen_to_payment_topic)
-        product_thread = threading.Thread(target=listen_to_product_topic)
-
+        self.stdout.write("Starting Kafka consumers...")
+        payment_thread = Thread(target=listen_to_payment_topic)
+        product_thread = Thread(target=listen_to_product_topic)
+        
         payment_thread.start()
         product_thread.start()
 

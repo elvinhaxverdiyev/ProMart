@@ -155,10 +155,13 @@ REST_FRAMEWORK = {
 # Kafka conf
 KAFKA_BOOTSTRAP_SERVERS = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "kafka:9092")
 KAFKA_PAYMENT_TOPIC = os.getenv("KAFKA_PAYMENT_TOPIC", "payment_topic")
+KAFKA_PRODUCT_TOPIC = os.getenv("KAFKA_PRODUCT_TOPIC", "products_topic")
 
 PAYPAL_MODE = os.getenv("PAYPAL_MODE", "sandbox")
 PAYPAL_CLIENT_ID = os.getenv("PAYPAL_CLIENT_ID")
 PAYPAL_CLIENT_SECRET = os.getenv("PAYPAL_CLIENT_SECRET")
+
+PAYMENT_BASE_URL = os.getenv("PAYMENT_BASE_URL", "http://localhost:8004")
 
 # Swagger configuration
 SWAGGER_SETTINGS = {

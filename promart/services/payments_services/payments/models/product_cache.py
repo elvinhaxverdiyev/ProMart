@@ -8,4 +8,4 @@ class ProductCache(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"ProductCache(product_id={self.product_id}, name={self.name}, price={self.price})"
+        return f"ProductCache(id={self.product_id}, name={self.name}, price={self.price})"

@@ -16,15 +16,15 @@ consumer = KafkaConsumer(
 )
 
 def listen_to_payment_topic():
-    """
-    Listens to the Kafka payment topic and processes incoming order data.
-
-    This function continuously consumes messages from the configured Kafka
-    payment topic. For each received message, it logs the order data and 
-    triggers the payment processing logic via the `process_payment_event` function.
-    """
-    logger.info(f"Listening to topic: {settings.KAFKA_PAYMENT_TOPIC}")
-    for message in consumer:
-        order_data = message.value
-        logger.info(f"Order data received: {order_data}")
-        process_payment_event(order_data)
+    logger.info(f"Starting Kafka consumer for topic: {settings.KAFKA_PAYMENT_TOPIC}")
+    try:
+        for message in consumer:
+            order_data = message.value
+            logger.info(f"Received message from Kafka: {order_data}")
+            try:
+                process_payment_event(order_data)
+            except Exception as e:
+                logger.error(f"Error processing payment event: {e}")
+    except Exception as e:
+        logger.error(f"Kafka consumer error: {e}")
+        consumer.close()

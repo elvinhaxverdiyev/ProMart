@@ -45,7 +45,7 @@ services:
     networks:
       - promart-network
     command: sh -c "sleep 35 && python manage.py runserver 0.0.0.0:8002"
-
+  
   products_service:
     environment:
       - PYTHONPATH=/app:/app/promart/services
@@ -63,7 +63,6 @@ services:
     networks:
       - promart-network
     command: python manage.py runserver 0.0.0.0:8001
-
 
   orders_service:
     build:

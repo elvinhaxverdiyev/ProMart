@@ -14,4 +14,5 @@ urlpatterns = [
         PaymentCancelView.as_view(), 
         name="payment_cancel"
     )
+    
 ]
