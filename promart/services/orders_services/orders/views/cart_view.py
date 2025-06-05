@@ -8,6 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 from orders.models.cart_model import Cart
 from orders.serializers.cart_serializers import CartSerializer
 from orders.kafka.producer import send_order_to_payment_topic
+from orders.models.product_replica import ProductReplica
 
 __all__ = [
     "ToggleCartView",
@@ -91,13 +92,20 @@ class ToggleCartView(APIView):
         
         if not product_id:
             return Response({"error": "Product ID is required."}, status=status.HTTP_400_BAD_REQUEST)
-
+        
         success, cart_item = Cart.toggle_cart(user=request.user, product_id=product_id)
+
+        product = ProductReplica.objects.filter(product_id=product_id).first()
+
+        if not product:
+            return Response({"error": "Product not found."}, status=status.HTTP_404_NOT_FOUND)
 
         send_order_to_payment_topic({
             "user_id": str(request.user.id),
             "product_id": product_id,
             "cart_id": cart_item.id if cart_item else None,
+            "price": str(product.price),
+            "quantity": cart_item.quantity if cart_item else None,
             "action": "added" if success else "removed"
         })
 

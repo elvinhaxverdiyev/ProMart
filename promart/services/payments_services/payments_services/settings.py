@@ -161,7 +161,7 @@ PAYPAL_MODE = os.getenv("PAYPAL_MODE", "sandbox")
 PAYPAL_CLIENT_ID = os.getenv("PAYPAL_CLIENT_ID")
 PAYPAL_CLIENT_SECRET = os.getenv("PAYPAL_CLIENT_SECRET")
 
-PAYMENT_BASE_URL = os.getenv("PAYMENT_BASE_URL", "http://localhost:8004")
+PAYPAL_BASE_URL = os.getenv("PAYPAL_BASE_URL", "https://api-m.sandbox.paypal.com")
 
 # Swagger configuration
 SWAGGER_SETTINGS = {

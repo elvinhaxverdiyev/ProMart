@@ -64,20 +64,20 @@ services:
       - promart-network
     command: python manage.py runserver 0.0.0.0:8001
 
-  orders_service:
-    build:
-      context: ./promart/services/orders_services
-      dockerfile: Dockerfile
-    container_name: orders_service
-    env_file: ./promart/services/orders_services/.env.docker
-    ports:
-      - "8003:8003"
-    depends_on:
-      postgres:
-        condition: service_healthy
-    networks:
-      - promart-network
-    command: python manage.py runserver 0.0.0.0:8003
+    orders_service:
+      build:
+        context: ./promart/services/orders_services
+        dockerfile: Dockerfile
+      container_name: orders_service
+      env_file: ./promart/services/orders_services/.env.docker
+      ports:
+        - "8003:8003"
+      depends_on:
+        - postgres
+        - kafka
+      networks:
+        - promart-network
+      command: sh -c "sleep 35 && python manage.py consume_products"
 
   postgres:
     image: postgres:15

@@ -1,3 +1,4 @@
+# Bu, Django tətbiqinizin olduğu yerdəki əsas Dockerfile
 FROM python:3.11-slim
 
 WORKDIR /app
@@ -15,4 +16,5 @@ COPY . /app/
 
 EXPOSE 8003
 
-CMD ["gunicorn", "order_service.wsgi:application", "--bind", "0.0.0.0:8003"]
+# Kafka consumer-i burada çalıştırmaq üçün addım əlavə olunur
+CMD ["sh", "-c", "python manage.py consume_products"]
