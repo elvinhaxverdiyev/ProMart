@@ -4,6 +4,18 @@ import json
 _producer = None
 
 def get_producer():
+    """
+    Returns a singleton KafkaProducer instance.
+
+    If a KafkaProducer does not already exist, it initializes one with the
+    specified configuration:
+    - `bootstrap_servers`: The Kafka server address.
+    - `value_serializer`: Serializes Python objects to JSON-encoded UTF-8.
+    - `key_serializer`: Serializes keys as UTF-8 strings.
+
+    Returns:
+        KafkaProducer: A singleton KafkaProducer instance.
+    """
     global _producer
     if _producer is None:
         _producer = KafkaProducer(
