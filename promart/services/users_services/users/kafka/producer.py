@@ -26,6 +26,17 @@ def get_producer():
     return _producer
 
 def send_message(topic, key, value):
+    """
+    Sends a message to the specified Kafka topic.
+
+    Args:
+        topic (str): The name of the Kafka topic.
+        key (str or int): The message key used for partitioning.
+        value (dict): The message payload to send (will be serialized as JSON).
+    
+    This function uses the singleton KafkaProducer to send the message and
+    then immediately flushes the producer to ensure delivery.
+    """
     producer = get_producer()
     producer.send(topic, key=key, value=value)
     producer.flush()
