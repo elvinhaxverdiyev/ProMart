@@ -6,6 +6,12 @@ logger = logging.getLogger(__name__)
 _producer = None
 
 def get_producer():
+    """
+    Initializes and returns a singleton Kafka producer instance.
+
+    Returns:
+        KafkaProducer: A configured Kafka producer.
+    """
     global _producer
     if _producer is None:
         _producer = KafkaProducer(
