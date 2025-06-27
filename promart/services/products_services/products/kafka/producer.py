@@ -23,6 +23,14 @@ def get_producer():
     return _producer
 
 def send_message(topic, key, value):
+    """
+    Sends a message to the specified Kafka topic.
+
+    Args:
+        topic (str): Kafka topic name.
+        key (str or int): Message key, used for partitioning.
+        value (dict): Message payload to be serialized and sent.
+    """
     producer = get_producer()
     try:
         producer.send(topic, key=key, value=value)
