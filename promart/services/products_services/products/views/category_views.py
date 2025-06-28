@@ -14,11 +14,8 @@ __all__ = [
 
 
 class SuperCategoryAPIView(APIView):
-    """
-    API endpoint for listing all super categories.
-    
-    This view returns all categories that do not have a parent category, i.e., super categories.
-    """
+    """Returns all categories without a parent (super categories)."""
+
     @swagger_auto_schema(
         operation_description="Retrieve all super categories that do not have a parent category.",
         tags=["Categories"],
