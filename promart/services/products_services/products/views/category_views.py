@@ -34,11 +34,7 @@ class SuperCategoryAPIView(APIView):
 
 
 class SubCategoryAPIView(APIView):
-    """
-    API endpoint for listing all sub-categories under a specific super category.
-    
-    This view returns all sub-categories associated with a given super category, identified by its ID.
-    """
+    """Returns all sub-categories of a given super category."""
     @swagger_auto_schema(
         operation_description="Retrieve all sub-categories under a specific super category identified by its ID.",
         tags=["Categories"],
