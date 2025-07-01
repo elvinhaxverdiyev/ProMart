@@ -65,14 +65,7 @@ class CommentListAPIView(APIView):
     )
     def get(self, request: Any, product_id: int) -> Response:
         """
-        Retrieves all comments for a given post.
-
-        Args:
-            request: The HTTP request.
-            post_id: The ID of the post for which comments are retrieved.
-
-        Returns:
-            A Response object containing a list of comments.
+        Returns comments for the product.
         """
         products = get_object_or_404(Product, id=product_id)
         comments = products.comments.all()
