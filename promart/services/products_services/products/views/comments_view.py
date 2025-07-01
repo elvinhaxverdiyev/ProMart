@@ -36,14 +36,7 @@ class CommentCreateAPIView(APIView):
     )
     def post(self, request: Any, product_id: int) -> Response:
         """
-        Creates a new comment for a given post.
-
-        Args:
-            request: The HTTP request containing comment data.
-            post_id: The ID of the post to which the comment will be added.
-
-        Returns:
-            A Response object containing the comment data or error message.
+        Creates a new comment.
         """
         product = get_object_or_404(Product, id=product_id)
         serializer = CommentSerializer(data=request.data, context={"request": request})
